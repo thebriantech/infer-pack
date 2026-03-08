@@ -1,0 +1,24 @@
+site_name: InferPack
+site_description: Production-grade AI inference runtime with HTTP and gRPC APIs
+site_url: https://example.com/inferpack
+repo_name: infer-pack
+repo_url: https://example.com/inferpack
+
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - API:
+      - HTTP: api-http.md
+      - gRPC: api-grpc.md
+  - Pipelines: pipelines.md
+  - Deployment: deployment.md
+  - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true

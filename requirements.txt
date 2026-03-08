@@ -1,0 +1,13 @@
+# InferPack - Phase 1 dependencies
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29,<1.0
+pydantic>=2.6,<3.0
+pyyaml>=6.0,<7.0
+httpx>=0.27,<1.0
+numpy>=1.26,<3.0
+Pillow>=10.0,<12.0
+grpcio>=1.62,<2.0
+python-multipart
+
+# Optional: Triton gRPC client (needed when triton.protocol="grpc")
+tritonclient[grpc]>=2.42

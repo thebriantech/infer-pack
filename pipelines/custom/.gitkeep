@@ -1,0 +1,7 @@
+# Place custom pipeline YAML files in this directory.
+# They will be discovered automatically on startup.
+#
+# A pipeline YAML file must define:
+#   name, description, version, models, stages
+#
+# See pipelines/builtins/ for examples.

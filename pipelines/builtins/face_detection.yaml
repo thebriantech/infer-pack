@@ -1,0 +1,37 @@
+# face_detection pipeline
+# Detect faces in an input image using SCRFD-10G.
+
+name: face_detection
+description: "Detect faces in an input image and return bounding boxes with confidence scores (SCRFD-10G)."
+version: "1.0.0"
+
+models:
+  - face_detection_model
+
+stages:
+  - name: image_preprocess
+    type: image_preprocess
+    timeout_seconds: 10
+    max_retries: 0
+    config:
+      image_keys: ["image_bytes"]
+      output_keys: ["preprocessed_image"]
+      target_size: [640, 640]
+      norm_mode: scrfd
+
+  - name: face_detection
+    type: face_detection
+    timeout_seconds: 30
+    max_retries: 1
+    config:
+      model_name: face_detection_model
+      input_key: preprocessed_image
+      confidence_threshold: 0.5
+      nms_threshold: 0.4
+
+  - name: detection_postprocess
+    type: detection_postprocess
+    timeout_seconds: 5
+    max_retries: 0
+    config:
+      max_faces: 100

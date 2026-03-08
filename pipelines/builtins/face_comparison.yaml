@@ -1,0 +1,114 @@
+# face_comparison pipeline
+# Compare two face images and return a similarity score.
+# Uses SCRFD-10G for detection and ArcFace-R50 (w600k) for recognition.
+
+name: face_comparison
+description: "Compare two face images and return a similarity score indicating whether they are the same person."
+version: "1.0.0"
+
+models:
+  - face_detection_model
+  - face_feature_extraction_model
+
+stages:
+  # --- Image 1 processing ---
+  - name: preprocess_image_1
+    type: image_preprocess
+    timeout_seconds: 10
+    max_retries: 0
+    config:
+      image_keys: ["image_bytes_1"]
+      output_keys: ["preprocessed_image_1"]
+      target_size: [640, 640]
+      norm_mode: scrfd
+
+  - name: detect_faces_1
+    type: face_detection
+    timeout_seconds: 30
+    max_retries: 1
+    config:
+      model_name: face_detection_model
+      input_key: preprocessed_image_1
+      output_key: detections_1
+      confidence_threshold: 0.5
+      nms_threshold: 0.4
+
+  - name: crop_faces_1
+    type: face_crop
+    timeout_seconds: 5
+    max_retries: 0
+    config:
+      image_keys: ["image_bytes_1"]
+      detection_keys: ["detections_1"]
+      output_keys: ["cropped_faces_1"]
+      crop_size: [112, 112]
+      norm_mode: arcface
+
+  - name: extract_features_1
+    type: face_feature_extraction
+    timeout_seconds: 30
+    max_retries: 1
+    config:
+      model_name: face_feature_extraction_model
+      input_key: cropped_faces_1
+      output_key: embeddings_1
+      triton_input_name: "input.1"
+      triton_output_name: "683"
+      enable_triton_batching: true
+      triton_batch_size: 8
+
+  # --- Image 2 processing ---
+  - name: preprocess_image_2
+    type: image_preprocess
+    timeout_seconds: 10
+    max_retries: 0
+    config:
+      image_keys: ["image_bytes_2"]
+      output_keys: ["preprocessed_image_2"]
+      target_size: [640, 640]
+      norm_mode: scrfd
+
+  - name: detect_faces_2
+    type: face_detection
+    timeout_seconds: 30
+    max_retries: 1
+    config:
+      model_name: face_detection_model
+      input_key: preprocessed_image_2
+      output_key: detections_2
+      confidence_threshold: 0.5
+      nms_threshold: 0.4
+
+  - name: crop_faces_2
+    type: face_crop
+    timeout_seconds: 5
+    max_retries: 0
+    config:
+      image_keys: ["image_bytes_2"]
+      detection_keys: ["detections_2"]
+      output_keys: ["cropped_faces_2"]
+      crop_size: [112, 112]
+      norm_mode: arcface
+
+  - name: extract_features_2
+    type: face_feature_extraction
+    timeout_seconds: 30
+    max_retries: 1
+    config:
+      model_name: face_feature_extraction_model
+      input_key: cropped_faces_2
+      output_key: embeddings_2
+      triton_input_name: "input.1"
+      triton_output_name: "683"
+      enable_triton_batching: true
+      triton_batch_size: 8
+
+  # --- Comparison ---
+  - name: compare_features
+    type: feature_comparison
+    timeout_seconds: 5
+    max_retries: 0
+    config:
+      embedding_key_1: embeddings_1
+      embedding_key_2: embeddings_2
+      similarity_threshold: 0.6

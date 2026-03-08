@@ -1,0 +1,193 @@
+/* InferPack Dashboard — minimal styles */
+:root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e1e1e6;
+    --muted: #8b8d97;
+    --accent: #6c63ff;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --blue: #3b82f6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 1rem 2rem;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+header h1 { font-size: 1.4rem; font-weight: 700; }
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.badge.ok      { background: var(--green); color: #000; }
+.badge.degraded { background: var(--yellow); color: #000; }
+.badge.error   { background: var(--red); color: #fff; }
+.badge.version { background: var(--border); color: var(--muted); }
+
+section {
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Pipeline cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.pipeline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.pipeline-card h3 {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pipeline-card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0.4rem 0;
+}
+
+.pipeline-card .models {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.pipeline-card button {
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-activate   { background: var(--green); color: #000; }
+.btn-deactivate { background: var(--red); color: #fff; }
+
+/* Model table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 0.6rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+th {
+    background: var(--border);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+}
+
+/* Execute form */
+#execute-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 500px;
+}
+
+#execute-form label {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+#execute-form select,
+#execute-form input[type="file"] {
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.85rem;
+}
+
+#execute-form button {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#exec-result {
+    margin-top: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+}
+
+/* Events */
+#events-log {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-family: monospace;
+    font-size: 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
+    color: var(--muted);
+}

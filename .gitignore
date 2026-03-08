@@ -3,6 +3,11 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Generated protobuf / gRPC stubs (regenerated at build time)
+src/inferpack/api/grpc/inferpack_pb2.py
+src/inferpack/api/grpc/inferpack_pb2.pyi
+src/inferpack/api/grpc/inferpack_pb2_grpc.py
+
 # C extensions
 *.so
 
@@ -153,6 +158,11 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# Models: ignore large model files but keep the README and .gitkeep placeholder
+models/*
+!models/.gitkeep
+!models/README.md
 
 # mypy
 .mypy_cache/

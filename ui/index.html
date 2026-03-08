@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InferPack Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>InferPack</h1>
+        <span id="version" class="badge"></span>
+        <span id="triton-status" class="badge"></span>
+    </header>
+
+    <main>
+        <!-- Pipelines -->
+        <section id="pipelines-section">
+            <h2>Pipelines</h2>
+            <div id="pipelines-list" class="card-grid"></div>
+        </section>
+
+        <!-- Models -->
+        <section id="models-section">
+            <h2>Models</h2>
+            <table id="models-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>State</th>
+                        <th>Refs</th>
+                        <th>Active Inferences</th>
+                        <th>Last Used</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <!-- Execute Pipeline -->
+        <section id="execute-section">
+            <h2>Execute Pipeline</h2>
+            <form id="execute-form">
+                <label for="exec-pipeline">Pipeline:</label>
+                <select id="exec-pipeline"></select>
+
+                <label for="exec-image">Image (single):</label>
+                <input type="file" id="exec-image" accept="image/*">
+
+                <label for="exec-image-1">Image 1 (comparison):</label>
+                <input type="file" id="exec-image-1" accept="image/*">
+
+                <label for="exec-image-2">Image 2 (comparison):</label>
+                <input type="file" id="exec-image-2" accept="image/*">
+
+                <button type="submit">Run</button>
+            </form>
+            <div id="exec-result"></div>
+        </section>
+
+        <!-- Events -->
+        <section id="events-section">
+            <h2>System Events</h2>
+            <div id="events-log"></div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

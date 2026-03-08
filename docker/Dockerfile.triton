@@ -1,0 +1,33 @@
+# =========================================================================
+# Triton Inference Server — Dockerfile
+# =========================================================================
+# Uses the official NVIDIA Triton image with explicit model control mode
+# so the InferPack control plane can load/unload models on demand.
+# =========================================================================
+
+FROM nvcr.io/nvidia/tritonserver:26.02-py3
+
+LABEL maintainer="InferPack Authors"
+LABEL description="Triton Inference Server for InferPack"
+
+# The model repository is mounted at /models via Docker volume.
+# Triton is configured with --model-control-mode=explicit so that
+# NO models are loaded at startup — InferPack loads them on demand.
+
+ENV MODEL_REPOSITORY="/models"
+
+EXPOSE 8000 8001 8002
+
+# Health check — Triton v2 health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/v2/health/ready || exit 1
+
+STOPSIGNAL SIGTERM
+
+ENTRYPOINT ["tritonserver"]
+CMD [ \
+    "--model-repository=/models", \
+    "--model-control-mode=explicit", \
+    "--strict-model-config=true", \
+    "--log-verbose=0" \
+]

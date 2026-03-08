@@ -1,0 +1,77 @@
+# =========================================================================
+# InferPack Runtime — Dockerfile
+# =========================================================================
+# Multi-stage build for a lean production image.
+# =========================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: builder — install Python dependencies
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt \
+    && pip install --no-cache-dir --prefix=/install grpcio-tools
+
+# ---------------------------------------------------------------------------
+# Stage 2: runtime
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim AS runtime
+
+LABEL maintainer="InferPack Authors"
+LABEL description="InferPack AI inference runtime"
+
+# Non-root user
+RUN groupadd -r inferpack && useradd -r -g inferpack -d /app inferpack
+
+# Install dependencies from builder
+COPY --from=builder /install /usr/local
+
+# Application code
+WORKDIR /app
+COPY src/ src/
+COPY config/ config/
+COPY pipelines/ pipelines/
+COPY ui/ ui/
+
+# Regenerate protobuf stubs so gencode matches the installed protobuf runtime
+RUN python -m grpc_tools.protoc \
+        -I src/inferpack/api/grpc \
+        --python_out=src/inferpack/api/grpc \
+        --grpc_python_out=src/inferpack/api/grpc \
+        --pyi_out=src/inferpack/api/grpc \
+        src/inferpack/api/grpc/inferpack.proto \
+    && sed -i 's/^import inferpack_pb2 as/from inferpack.api.grpc import inferpack_pb2 as/' \
+        src/inferpack/api/grpc/inferpack_pb2_grpc.py
+
+# Ensure __pycache__ is not stale
+RUN python -m compileall src/
+
+# Fix ownership
+RUN chown -R inferpack:inferpack /app
+
+USER inferpack
+
+# Configuration
+ENV PYTHONPATH="/app/src"
+ENV INFERPACK_CONFIG="/app/config/inferpack.yaml"
+ENV INFERPACK_TRITON_HOST="triton"
+ENV INFERPACK_SERVER_HOST="0.0.0.0"
+ENV INFERPACK_SERVER_PORT="9000"
+ENV INFERPACK_SERVER_GRPC_PORT="9001"
+
+EXPOSE 9000 9001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import httpx; r=httpx.get('http://localhost:9000/api/v1/health'); r.raise_for_status()" || exit 1
+
+# Graceful shutdown via SIGTERM
+STOPSIGNAL SIGTERM
+
+# Starts both HTTP (uvicorn) and gRPC servers via the application lifespan.
+# The gRPC server is launched inside the FastAPI lifespan context manager
+# when uvicorn boots the app (see inferpack.main:lifespan).
+ENTRYPOINT ["python", "-m", "inferpack.main"]
