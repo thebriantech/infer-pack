@@ -60,6 +60,7 @@ class ModelRegistry:
             return [m for m in self._models.values() if m.state == state]
 
     def contains(self, model_name: str) -> bool:
+        """Return True if *model_name* is registered."""
         with self._lock:
             return model_name in self._models
 
@@ -133,6 +134,7 @@ class ModelRegistry:
     # ------------------------------------------------------------------
 
     def _require(self, model_name: str) -> ModelInfo:
+        """Return ``ModelInfo`` for *model_name*, raising ``ModelNotFoundError`` if absent."""
         info = self._models.get(model_name)
         if info is None:
             raise ModelNotFoundError(f"Model not found: {model_name}")

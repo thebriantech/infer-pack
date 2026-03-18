@@ -43,6 +43,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         request: pb2.ListPipelinesRequest,
         context: grpc.aio.ServicerContext,
     ) -> pb2.ListPipelinesResponse:
+        """Return summaries of all registered pipelines."""
         service = PipelineService(self._state)
         summaries = service.list_pipelines()
         return pb2.ListPipelinesResponse(
@@ -69,6 +70,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         request: pb2.PipelineRequest,
         context: grpc.aio.ServicerContext,
     ) -> pb2.PipelineStatusResponse:
+        """Activate the requested pipeline, loading its models."""
         service = PipelineService(self._state)
         name = request.name
         try:
@@ -94,6 +96,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         request: pb2.PipelineRequest,
         context: grpc.aio.ServicerContext,
     ) -> pb2.PipelineStatusResponse:
+        """Deactivate the requested pipeline and release its model references."""
         service = PipelineService(self._state)
         name = request.name
         try:
@@ -119,6 +122,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         request: pb2.ExecutePipelineRequest,
         context: grpc.aio.ServicerContext,
     ) -> pb2.ExecutePipelineResponse:
+        """Execute a named pipeline with image and JSON inputs supplied in the request."""
         name = request.name
         inputs: dict[str, Any] = {}
         for key, value in request.image_inputs.items():
@@ -138,6 +142,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         request: pb2.ExecuteFaceDetectionRequest,
         context: grpc.aio.ServicerContext,
     ) -> pb2.ExecutePipelineResponse:
+        """Run the face_detection pipeline on the provided image bytes."""
         inputs: dict[str, Any] = {"image_bytes": request.image}
         return await self._execute_pipeline_by_name("face_detection", inputs, context)
 
@@ -146,6 +151,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         request: pb2.ExecuteFaceComparisonRequest,
         context: grpc.aio.ServicerContext,
     ) -> pb2.ExecutePipelineResponse:
+        """Run the face_comparison pipeline on two provided image byte strings."""
         inputs: dict[str, Any] = {
             "image_bytes_1": request.image_1,
             "image_bytes_2": request.image_2,
@@ -158,6 +164,7 @@ class PipelineServicer(pb2_grpc.PipelineServiceServicer):
         inputs: dict[str, Any],
         context: grpc.aio.ServicerContext,
     ) -> pb2.ExecutePipelineResponse:
+        """Delegate pipeline execution to ``PipelineService`` and map the result to a gRPC response."""
         service = PipelineService(self._state)
 
         try:

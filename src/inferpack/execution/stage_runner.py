@@ -102,9 +102,10 @@ async def run_stage(
                 exc,
             )
 
-        # Brief delay before retry
+        # Linear backoff before retry, capped at 5× the base delay
         if attempt < attempts:
-            await asyncio.sleep(min(1.0 * attempt, 5.0))
+            delay = min(stage_def.retry_delay_seconds * attempt, stage_def.retry_delay_seconds * 5)
+            await asyncio.sleep(delay)
 
     # All retries exhausted
     return StageResult(

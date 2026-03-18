@@ -43,6 +43,7 @@ class ArcFaceExtractionStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> dict[str, Any]:
+        """Run ArcFace inference on each cropped face and return L2-normalised embeddings."""
         model_name = config.get("model_name", "face_feature_extraction_model")
         input_key = config.get("input_key", "cropped_faces")
         output_key = config.get("output_key", "embeddings")
@@ -111,6 +112,7 @@ class ArcFaceExtractionStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> None:
+        """Raise ``StageValidationError`` if the cropped-faces input key is absent."""
         input_key = config.get("input_key", "cropped_faces")
         if input_key not in context:
             raise StageValidationError(f"Missing required input: {input_key}")

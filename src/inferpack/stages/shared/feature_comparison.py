@@ -32,6 +32,7 @@ class FeatureComparisonStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> dict[str, Any]:
+        """Compute cosine similarity between two embedding vectors and apply a threshold."""
         threshold = config.get("similarity_threshold", 0.6)
         key1 = config.get("embedding_key_1", "embeddings_1")
         key2 = config.get("embedding_key_2", "embeddings_2")
@@ -57,6 +58,7 @@ class FeatureComparisonStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> None:
+        """Raise ``StageValidationError`` if either embedding key is absent or empty."""
         key1 = config.get("embedding_key_1", "embeddings_1")
         key2 = config.get("embedding_key_2", "embeddings_2")
         for key in [key1, key2]:
@@ -68,6 +70,7 @@ class FeatureComparisonStage(PipelineStage):
 
     @staticmethod
     def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+        """Return the cosine similarity between vectors *a* and *b*, or 0.0 if either is zero."""
         norm_a = np.linalg.norm(a)
         norm_b = np.linalg.norm(b)
         if norm_a == 0 or norm_b == 0:

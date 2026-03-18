@@ -106,6 +106,7 @@ class StageDefinition:
     config: dict[str, Any] = field(default_factory=dict)
     timeout_seconds: float = 30.0
     max_retries: int = 0
+    retry_delay_seconds: float = 1.0  # base delay; multiplied by attempt number (linear backoff)
 
 
 @dataclass

@@ -33,9 +33,28 @@ from inferpack.api.grpc.servicer import PipelineServicer
 logger = logging.getLogger("inferpack")
 
 
+def _resolve_dir(dir_config: str, base_dir: Path) -> Path:
+    """Return an absolute Path for *dir_config*.
+
+    If *dir_config* is already absolute it is returned unchanged.
+    Otherwise it is joined to *base_dir* (the project root).
+    """
+    p = Path(dir_config)
+    return p if p.is_absolute() else base_dir / p
+
+
 # ---------------------------------------------------------------------------
 # Lifespan
 # ---------------------------------------------------------------------------
+
+_BANNER = r"""
+  ___  _   _ _____ _____ ____    ____   _    ____ _  __
+ |_ _|| \ | |  ___| ____|  _ \  |  _ \ / \  / ___| |/ /
+  | | |  \| | |_  |  _| | |_) | | |_) / _ \| |   | ' /
+  | | | |\  |  _| | |___|  _ <  |  __/ ___ \ |___| . \
+ |___||_| \_|_|   |_____|_| \_\ |_| /_/   \_\____|_|\_\
+"""
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -53,10 +72,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     state = create_app_state(config)
     app.state.app = state
 
-    # Discover pipelines
-    base_dir = Path(__file__).resolve().parent.parent.parent  # project root
-    builtin_dir = str(base_dir / config.builtin_pipelines_dir)
-    custom_dir = str(base_dir / config.custom_pipelines_dir)
+    # Discover pipelines — absolute paths are used as-is; relative paths are
+    # resolved against the project root (three levels above this file).
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    builtin_dir = str(_resolve_dir(config.builtin_pipelines_dir, base_dir))
+    custom_dir = str(_resolve_dir(config.custom_pipelines_dir, base_dir))
     state.pipeline_registry.discover(builtin_dir, custom_dir)
 
     # Start model lifecycle background task
@@ -78,7 +98,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         config.server.host,
         config.server.grpc_port,
     )
-
+    print(_BANNER, flush=True)
     yield
 
     # Shutdown
@@ -101,10 +121,13 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # CORS — permissive for the local UI; tighten in production
+    # CORS — configured via config.server.cors_origins (default: ["*"]).
+    # Override via YAML (server.cors_origins) or env var
+    # INFERPACK_SERVER_CORS_ORIGINS (comma-separated list of allowed origins).
+    _cfg = load_config()
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=_cfg.server.cors_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )

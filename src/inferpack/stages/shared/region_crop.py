@@ -37,6 +37,7 @@ class RegionCropStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> dict[str, Any]:
+        """Crop, resize, and normalise each detected bounding-box region."""
         target_size = config.get("crop_size", [112, 112])
         margin = config.get("margin", 0.1)
         norm_mode = config.get("norm_mode", "arcface")
@@ -59,6 +60,7 @@ class RegionCropStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> None:
+        """Raise ``StageValidationError`` if any required image or detection key is absent."""
         image_keys = config.get("image_keys", ["image_bytes"])
         detection_keys = config.get("detection_keys", ["detections"])
         for key in [*image_keys, *detection_keys]:

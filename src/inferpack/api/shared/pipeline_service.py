@@ -15,12 +15,15 @@ class PipelineService:
         self._state = app_state
 
     def list_pipelines(self) -> list[dict[str, Any]]:
+        """Return summary dicts for every registered pipeline."""
         return self._state.pipeline_registry.list_all()
 
     async def activate_pipeline(self, name: str) -> None:
+        """Activate the named pipeline, loading all required models."""
         await self._state.pipeline_registry.activate(name)
 
     async def deactivate_pipeline(self, name: str) -> None:
+        """Deactivate the named pipeline and decrement model reference counts."""
         await self._state.pipeline_registry.deactivate(name)
 
     async def execute_pipeline(
@@ -28,6 +31,7 @@ class PipelineService:
         name: str,
         inputs: dict[str, Any],
     ) -> PipelineResult:
+        """Execute the named active pipeline with *inputs* and return the result."""
         try:
             pipeline_def = self._state.pipeline_registry.get(name)
         except PipelineNotFoundError:
@@ -51,6 +55,7 @@ def make_json_safe(data: dict[str, Any]) -> dict[str, Any]:
     import numpy as np
 
     def _safe(value: Any) -> Any:
+        """Recursively convert a value to a JSON-safe representation."""
         if isinstance(value, np.ndarray):
             return {
                 "type": "ndarray",

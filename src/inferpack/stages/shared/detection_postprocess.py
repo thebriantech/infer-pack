@@ -29,6 +29,7 @@ class DetectionPostprocessStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> dict[str, Any]:
+        """Sort detections by confidence, apply max-count limit, and return results."""
         detections: list[dict[str, Any]] = context["detections"]
         max_detections = config.get("max_detections", config.get("max_faces", 100))
 
@@ -49,5 +50,6 @@ class DetectionPostprocessStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> None:
+        """Raise ``StageValidationError`` if ``detections`` is absent from the context."""
         if "detections" not in context:
             raise StageValidationError("Missing required input: detections")

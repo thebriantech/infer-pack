@@ -127,12 +127,14 @@ class PipelineRegistry:
     # ------------------------------------------------------------------
 
     def get(self, name: str) -> PipelineDefinition:
+        """Return the ``PipelineDefinition`` for *name*, raising ``PipelineNotFoundError`` if absent."""
         entry = self._entries.get(name)
         if entry is None:
             raise PipelineNotFoundError(f"Pipeline not found: {name}")
         return entry.definition
 
     def get_state(self, name: str) -> PipelineState:
+        """Return the current ``PipelineState`` for *name*, raising ``PipelineNotFoundError`` if absent."""
         entry = self._entries.get(name)
         if entry is None:
             raise PipelineNotFoundError(f"Pipeline not found: {name}")

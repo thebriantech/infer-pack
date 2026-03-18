@@ -42,13 +42,16 @@ class PipelineExecutionContext:
         return self.data[key]
 
     def has(self, key: str) -> bool:
+        """Return True if *key* exists in the context data."""
         return key in self.data
 
     def record_stage(self, result: StageResult) -> None:
+        """Append a completed stage result to the execution history."""
         self.stage_results.append(result)
 
     @property
     def elapsed_seconds(self) -> float:
+        """Return wall-clock seconds elapsed since execution started."""
         return time.time() - self.start_time
 
     def summary(self) -> dict[str, Any]:

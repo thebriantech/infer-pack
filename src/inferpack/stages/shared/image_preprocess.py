@@ -42,6 +42,7 @@ class ImagePreprocessStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> dict[str, Any]:
+        """Decode, letterbox-resize, and normalise each configured input image."""
         target_size = config.get("target_size", [640, 640])
         norm_mode = config.get("norm_mode", "scrfd")
         output: dict[str, Any] = {}
@@ -65,6 +66,7 @@ class ImagePreprocessStage(PipelineStage):
         context: dict[str, Any],
         config: dict[str, Any],
     ) -> None:
+        """Raise ``StageValidationError`` if any required image key is absent from the context."""
         image_keys = config.get("image_keys", ["image_bytes"])
         for key in image_keys:
             if key not in context:

@@ -36,10 +36,12 @@ class TritonConfig:
 
     @property
     def http_url(self) -> str:
+        """Return the full HTTP base URL for the Triton server."""
         return f"http://{self.host}:{self.http_port}"
 
     @property
     def grpc_url(self) -> str:
+        """Return the host:port gRPC address for the Triton server."""
         return f"{self.host}:{self.grpc_port}"
 
 
@@ -70,6 +72,7 @@ class ServerConfig:
     port: int = 9000
     grpc_port: int = 9001
     log_level: str = "info"
+    cors_origins: list[str] = field(default_factory=lambda: ["*"])
 
 
 @dataclass
@@ -122,6 +125,8 @@ def _apply_yaml(config: InferPackConfig, data: dict[str, Any]) -> None:
         config.server.port = s.get("port", config.server.port)
         config.server.grpc_port = s.get("grpc_port", config.server.grpc_port)
         config.server.log_level = s.get("log_level", config.server.log_level)
+        if "cors_origins" in s:
+            config.server.cors_origins = list(s["cors_origins"])
 
     if "triton" in data:
         t = data["triton"]
@@ -202,3 +207,8 @@ def _apply_env(config: InferPackConfig) -> None:
         value = os.environ.get(env_key)
         if value is not None:
             setattr(config, attr, value)
+
+    # CORS origins — comma-separated env var overrides the list
+    cors_env = os.environ.get("INFERPACK_SERVER_CORS_ORIGINS", "").strip()
+    if cors_env:
+        config.server.cors_origins = [o.strip() for o in cors_env.split(",") if o.strip()]

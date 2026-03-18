@@ -20,6 +20,7 @@ import numpy as np
 from inferpack.config import TritonConfig
 from inferpack.core.errors import InferenceError, InferenceServerNotReady
 from inferpack.core.interfaces import InferenceClient
+from inferpack.inference.dtype_utils import numpy_to_triton_dtype
 
 logger = logging.getLogger(__name__)
 
@@ -42,41 +43,6 @@ _MODEL_UNLOAD = f"/{_SVC}/RepositoryModelUnload"
 _INFER = f"/{_SVC}/ModelInfer"
 
 
-# ---------------------------------------------------------------------------
-# Numpy ↔ Triton dtype mapping
-# ---------------------------------------------------------------------------
-
-_NP_TO_TRITON: dict[str, str] = {
-    "float32": "FP32",
-    "float64": "FP64",
-    "float16": "FP16",
-    "int8": "INT8",
-    "int16": "INT16",
-    "int32": "INT32",
-    "int64": "INT64",
-    "uint8": "UINT8",
-    "uint16": "UINT16",
-    "uint32": "UINT32",
-    "uint64": "UINT64",
-    "bool": "BOOL",
-}
-
-_TRITON_TO_NP: dict[str, str] = {v: k for k, v in _NP_TO_TRITON.items()}
-
-
-def _numpy_to_triton_dtype(dtype: np.dtype) -> str:  # type: ignore[type-arg]
-    name = dtype.name
-    triton = _NP_TO_TRITON.get(name)
-    if triton is None:
-        raise InferenceError(f"Unsupported numpy dtype for Triton: {name}")
-    return triton
-
-
-def _triton_to_numpy_dtype(triton_dtype: str) -> np.dtype:  # type: ignore[type-arg]
-    name = _TRITON_TO_NP.get(triton_dtype)
-    if name is None:
-        raise InferenceError(f"Unsupported Triton dtype: {triton_dtype}")
-    return np.dtype(name)
 
 
 # ---------------------------------------------------------------------------
@@ -193,7 +159,7 @@ class TritonGRPCClient(InferenceClient):
         infer_inputs = []
         for name, array in inputs.items():
             arr = np.asarray(array)
-            triton_dtype = _numpy_to_triton_dtype(arr.dtype)
+            triton_dtype = numpy_to_triton_dtype(arr.dtype)
             inp = triton_grpc.InferInput(name, list(arr.shape), triton_dtype)
             inp.set_data_from_numpy(arr)
             infer_inputs.append(inp)

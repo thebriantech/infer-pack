@@ -1,5 +1,17 @@
 # InferPack
 
+## Version: Initial Release (March 2026)
+
+This is the first public release of InferPack.
+
+**Highlights:**
+- Built-in pipelines: face_detection, face_comparison
+- HTTP and gRPC APIs
+- Docker-first deployment (with NVIDIA Triton)
+- Model and pipeline lifecycle management
+- Shared business logic for all transports
+- Custom pipeline and model support
+
 InferPack is a production-oriented AI inference runtime built around NVIDIA Triton Inference Server.
 
 It provides:

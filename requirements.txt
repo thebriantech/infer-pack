@@ -8,6 +8,7 @@ numpy>=1.26,<3.0
 Pillow>=10.0,<12.0
 grpcio>=1.62,<2.0
 python-multipart
+grpcio-tools>=1.62,<2.0
 
 # Optional: Triton gRPC client (needed when triton.protocol="grpc")
 tritonclient[grpc]>=2.42

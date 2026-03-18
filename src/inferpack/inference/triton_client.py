@@ -18,6 +18,7 @@ import numpy as np
 from inferpack.config import TritonConfig
 from inferpack.core.errors import InferenceError, InferenceServerNotReady
 from inferpack.core.interfaces import InferenceClient
+from inferpack.inference.dtype_utils import numpy_to_triton_dtype
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ class TritonHTTPClient(InferenceClient):
                 {
                     "name": name,
                     "shape": list(arr.shape),
-                    "datatype": _numpy_to_triton_dtype(arr.dtype),
+                    "datatype": numpy_to_triton_dtype(arr.dtype),
                     "data": arr.flatten().tolist(),
                 }
             )
@@ -140,29 +141,3 @@ class TritonHTTPClient(InferenceClient):
         return outputs
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-_NP_TO_TRITON: dict[str, str] = {
-    "float32": "FP32",
-    "float64": "FP64",
-    "float16": "FP16",
-    "int8": "INT8",
-    "int16": "INT16",
-    "int32": "INT32",
-    "int64": "INT64",
-    "uint8": "UINT8",
-    "uint16": "UINT16",
-    "uint32": "UINT32",
-    "uint64": "UINT64",
-    "bool": "BOOL",
-}
-
-
-def _numpy_to_triton_dtype(dtype: np.dtype) -> str:  # type: ignore[type-arg]
-    name = dtype.name
-    triton = _NP_TO_TRITON.get(name)
-    if triton is None:
-        raise InferenceError(f"Unsupported numpy dtype for Triton: {name}")
-    return triton

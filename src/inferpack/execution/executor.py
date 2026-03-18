@@ -37,6 +37,7 @@ class PipelineExecutor:
         stage_registry: dict[str, Any],  # stage_type → PipelineStage instance
         config: ExecutionConfig,
     ) -> None:
+        """Initialise the executor with a stage registry and execution config."""
         self._stages = stage_registry
         self._config = config
         self._semaphore = asyncio.Semaphore(config.max_concurrent_executions)
@@ -59,6 +60,7 @@ class PipelineExecutor:
         pipeline: PipelineDefinition,
         inputs: dict[str, Any],
     ) -> PipelineResult:
+        """Run all stages of *pipeline* sequentially and return the aggregated result."""
         ctx = PipelineExecutionContext(pipeline_name=pipeline.name, data=dict(inputs))
         t0 = time.time()
 
