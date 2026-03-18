@@ -33,8 +33,11 @@ It provides:
 ## Getting started
 
 ```bash
-cd docker
-docker compose up -d --build
+# 1. Download built-in models from HuggingFace
+make download-models
+
+# 2. Start the stack (InferPack + Triton)
+make compose-up
 ```
 
 Then open:

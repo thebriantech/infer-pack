@@ -12,3 +12,6 @@ grpcio-tools>=1.62,<2.0
 
 # Optional: Triton gRPC client (needed when triton.protocol="grpc")
 tritonclient[grpc]>=2.42
+
+# Model download helper
+huggingface-hub>=0.22,<2.0

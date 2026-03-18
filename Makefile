@@ -12,13 +12,16 @@ IMG1 ?=
 IMG2 ?=
 
 .PHONY: help install install-docs run compose-up compose-down compose-build compose-logs \
-	proto check docs-serve docs-build clean test-http-detect test-http-compare \
-	test-grpc-detect test-grpc-compare
+	proto check docs-serve docs-build clean hf-login download-models upload-models \
+	test-http-detect test-http-compare test-grpc-detect test-grpc-compare
 
 help:
 	@echo "Useful commands:"
 	@echo "  make install            - Install runtime dependencies"
 	@echo "  make install-docs       - Install docs dependencies"
+	@echo "  make hf-login           - Log in to HuggingFace (required before upload)"
+	@echo "  make download-models    - Download built-in models from HuggingFace"
+	@echo "  make upload-models      - Upload local models/ to HuggingFace"
 	@echo "  make run                - Run InferPack locally"
 	@echo "  make compose-up         - Start docker compose stack"
 	@echo "  make compose-down       - Stop docker compose stack"
@@ -38,6 +41,15 @@ help:
 
 install:
 	$(PIP) install -r requirements.txt
+
+hf-login:
+	$(PYTHON) -c "from huggingface_hub import login; login()"
+
+download-models:
+	$(PYTHON) scripts/download_models.py download
+
+upload-models:
+	$(PYTHON) scripts/download_models.py upload
 
 install-docs:
 	$(PIP) install -r requirements-docs.txt
